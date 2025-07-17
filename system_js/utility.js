@@ -1,2 +1,2 @@
-baseurl="http://localhost/royal_cask/";
-// baseurl = "https://webx.hrislkonline.com/";
+// baseurl="http://localhost/royal_cask/";
+baseurl = "https://rcd.hrislanka.com/";
