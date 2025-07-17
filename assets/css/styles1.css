@@ -20463,7 +20463,7 @@ progress {
     font-size: .875rem;
     font-weight: 400;
     line-height: 1.5;
-    color:#ffffff;
+    color: #ffffff;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -20490,7 +20490,7 @@ progress {
 }
 
 .form-control:focus {
-    color: var(--bs-heading-color);
+    color: #ffffff;
     background-color: transparent;
     border-color: #b1adff;
     outline: 0;

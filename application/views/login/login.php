@@ -70,13 +70,13 @@
                                                         <div class="d-flex align-items-center justify-content-between">
                                                             <label class="form-label" style="color: #ffffff;">Username</label>
                                                         </div>
-                                                        <input type="text" class="form-control" id="txt_username" name="txt_username" placeholder="Username" data-parsley-minlength="6" required="" aria-describedby="emailHelp">
+                                                        <input type="text" class="form-control" #ffffff id="txt_username" name="txt_username" placeholder="Username" data-parsley-minlength="6" required="" aria-describedby="emailHelp">
                                                     </div>
                                                     <div class="mb-4">
                                                         <div class="d-flex align-items-center justify-content-between">
                                                             <label class="form-label" style="color: #ffffff;">Password</label>
                                                         </div>
-                                                        <input type="password" class="form-control" id="txt_password" name="txt_password" placeholder="Password" required="">
+                                                        <input type="password" class="form-control" id="txt_password" #ffffff name="txt_password" placeholder="Password" required="">
                                                     </div>
                                                     <div id="divmessage">
                                                         <center>
