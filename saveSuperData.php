@@ -7,9 +7,9 @@ error_reporting(E_ALL);
 
 // Database connection details
 $servername = "localhost";
-$username = "webx_user";
-$password = "UtrZ7y40e53{";
-$database = "webx_db";
+$username = "rcd_user";
+$password = "2jgScOJjJSHR";
+$database = "rcd_db";
 
 // Create a connection to the database
 $conn = new mysqli($servername, $username, $password, $database);
