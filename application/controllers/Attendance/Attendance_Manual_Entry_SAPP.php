@@ -86,7 +86,7 @@ class Attendance_Manual_Entry_SAPP extends CI_Controller
 
         $data['data_set'] = $this->Db_model->getfilteredData("select  `M_ID`,`EmpNo`,`Emp_Full_Name`,`Att_Date`,`In_Time`,`tbl_manual_entry`.`Status`,`Reason` from tbl_manual_entry
 inner join tbl_empmaster
-on tbl_empmaster.EmpNo = tbl_manual_entry.Enroll_No where Is_App_Sup_User =0 and Is_Cancel=0 and App_Sup_User = $Emp
+on tbl_empmaster.EmpNo = tbl_manual_entry.Enroll_No where Is_App_Sup_User =0 and Is_Cancel=0
   {$filter}");
 
         $this->load->view('Attendance/Attendance_Manual_View_SUP/search_data', $data);
