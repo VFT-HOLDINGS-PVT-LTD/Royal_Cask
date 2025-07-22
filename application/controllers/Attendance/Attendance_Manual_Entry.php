@@ -36,6 +36,7 @@ class Attendance_Manual_Entry extends CI_Controller
         $data['data_set'] = $this->Db_model->getData('EmpNo,Emp_Full_Name', 'tbl_empmaster');
         $data['data_dep'] = $this->Db_model->getData('Dep_ID,Dep_Name', 'tbl_departments');
         $data['data_desig'] = $this->Db_model->getData('Des_ID,Desig_Name', 'tbl_designations');
+                $data['data_branch'] = $this->Db_model->getData('B_id,B_name', 'tbl_branches');
         $data['data_grp'] = $this->Db_model->getData('Grp_ID,EmpGroupName', 'tbl_emp_group');
         $data['data_cmp'] = $this->Db_model->getData('Cmp_ID,Company_Name', 'tbl_companyprofile');
         $data['data_set_att'] = $this->Db_model->getfilteredData("SELECT `M_ID`,`EmpNo`,`Emp_Full_Name`,`Att_Date`,`In_Time`,`tbl_manual_entry`.`Status`,`Reason` from tbl_manual_entry inner join tbl_empmaster on tbl_empmaster.EmpNo = tbl_manual_entry.Enroll_No WHERE Is_Admin_App_ID=1 order by M_ID desc");
@@ -296,7 +297,7 @@ class Attendance_Manual_Entry extends CI_Controller
             $x++;
         }
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Cm_international_miss_punch.xlsx';
+        $filename = 'rcd_miss_punch.xlsx';
 
         
         ob_clean();
