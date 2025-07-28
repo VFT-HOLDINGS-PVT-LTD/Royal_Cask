@@ -1,10 +1,12 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Salary_Advance extends CI_Controller {
+class Salary_Advance extends CI_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         if (!($this->session->userdata('login_user'))) {
             redirect(base_url() . "");
@@ -19,7 +21,8 @@ class Salary_Advance extends CI_Controller {
      * Index page
      */
 
-    public function index() {
+    public function index()
+    {
 
         $this->load->helper('url');
         $data['title'] = "Salary Advance Entry | HRM SYSTEM";
@@ -30,11 +33,12 @@ class Salary_Advance extends CI_Controller {
 
 
 
-//        $data['data_loan'] = $this->Db_model->getData('id,loan_name', 'tbl_loan_types');
+        //        $data['data_loan'] = $this->Db_model->getData('id,loan_name', 'tbl_loan_types');
         $this->load->view('Payroll/Salary_Advance/index', $data);
     }
 
-    public function dropdown() {
+    public function dropdown()
+    {
 
         $cat = $this->input->post('cmb_cat');
 
@@ -77,25 +81,26 @@ class Salary_Advance extends CI_Controller {
             }
         }
 
-//        if ($cat == "Department") {
-//            $query = $this->Db_model->get_dropdown_dep();
-//            
-//            echo"<select class='form-control' id='Dep' name='Dep'>";
-//            foreach ($query->result() as $row) {
-//                echo "<option value='" . $row->ID . "'>" . $row->Dep_Name . "</option>";
-//            }
-//            echo"</select>";
-//        }
+        //        if ($cat == "Department") {
+        //            $query = $this->Db_model->get_dropdown_dep();
+        //            
+        //            echo"<select class='form-control' id='Dep' name='Dep'>";
+        //            foreach ($query->result() as $row) {
+        //                echo "<option value='" . $row->ID . "'>" . $row->Dep_Name . "</option>";
+        //            }
+        //            echo"</select>";
+        //        }
     }
 
-    public function insert_data() {
+    public function insert_data()
+    {
 
         $currentUser = $this->session->userdata('login_user');
         $ApproveUser = $currentUser[0]->EmpNo;
 
         $cat = $this->input->post('cmb_cat');
         if ($cat == "Employee") {
-            $cat2 = $this->input->post('cmb_cat2');
+            $cat2 = $this->input->post('txt_nic');
             $string = "SELECT EmpNo FROM tbl_empmaster WHERE EmpNo='$cat2'";
             $EmpData = $this->Db_model->getfilteredData($string);
         }
@@ -128,45 +133,47 @@ class Salary_Advance extends CI_Controller {
         $timestamp = date_format($date, 'Y-m-d H:i:s');
 
 
-//        $Request_date = $this->input->post('txt_date');
+        //        $Request_date = $this->input->post('txt_date');
 
         $advance = $this->input->post('txt_advance');
         $year = date("Y");
-//        $month = date("m");
-         $month = $this->input->post('cmb_month');
+        //        $month = date("m");
+        $month = $this->input->post('cmb_month');
 
         $Emp = $EmpData[0]->EmpNo;
-//        var_dump($Emp);die;
+        //        var_dump($Emp);die;
 
         $Count = count($EmpData);
-//        var_dump($Count);die;
+        //        var_dump($Count);die;
 
         $SalPrecentage = $this->Db_model->getfilteredData("select (60/100)*(Basic_Salary+Incentive+Fixed_Allowance) as totsal from tbl_empmaster where EmpNo=$Emp");
 
         $HasRow = $this->Db_model->getfilteredData("select count(EmpNo) as HasRow from tbl_salary_advance where EmpNo=$Emp and Year=$year and month=$month");
 
-//        if ($advance > $SalPrecentage[0]->totsal) {
-//            $this->session->set_flashdata('error_message', 'Employee cannot apply more than salary precentage (60%)');
-//        }
-        if ($HasRow[0]->HasRow > 0) {
-            $this->session->set_flashdata('error_message', 'Employee already applied salary advance');
+        if ($advance > $SalPrecentage[0]->totsal) {
+            $this->session->set_flashdata('error_message', 'Employee cannot apply more than salary precentage (60%)');
         } else {
-            for ($i = 0; $i < $Count; $i++) {
-                $data = array(
-                    array(
-                        'EmpNo' => $Emp,
-                        'Amount' => $advance,
-                        'Year' => $year,
-                        'Month' => $month,
-                        'Is_pending' => 0,
-                        'Approved_by' => $ApproveUser,
-                        'Is_Approve' => 1,
-                        'Is_Approve' => $timestamp,
-                ));
-                $this->db->insert_batch('tbl_salary_advance', $data);
-                $this->session->set_flashdata('success_message', 'New Salary advance added successfully');
+            if ($HasRow[0]->HasRow > 0) {
+                $this->session->set_flashdata('error_message', 'Employee already applied salary advance');
+            } else {
+                for ($i = 0; $i < $Count; $i++) {
+                    $data = array(
+                        array(
+                            'EmpNo' => $Emp,
+                            'Amount' => $advance,
+                            'Year' => $year,
+                            'Month' => $month,
+                            'Is_pending' => 0,
+                            'Approved_by' => $ApproveUser,
+                            'Is_Approve' => 0,
+                        )
+                    );
+                    $this->db->insert_batch('tbl_salary_advance', $data);
+                    $this->session->set_flashdata('success_message', 'New Salary advance added successfully');
+                }
             }
         }
+
         redirect('/Pay/Salary_Advance');
     }
 
@@ -174,7 +181,8 @@ class Salary_Advance extends CI_Controller {
      * Get Data
      */
 
-    public function getSal_Advance() {
+    public function getSal_Advance()
+    {
 
         $emp = $this->input->post("txt_emp");
         $emp_name = $this->input->post("txt_emp_name");
@@ -269,7 +277,8 @@ class Salary_Advance extends CI_Controller {
      * Approve salary advance request
      */
 
-    public function approve($ID) {
+    public function approve($ID)
+    {
 
         $currentUser = $this->session->userdata('login_user');
         $Emp = $currentUser[0]->EmpNo;
@@ -292,7 +301,8 @@ class Salary_Advance extends CI_Controller {
      * Reject salary advance request
      */
 
-    public function reject($ID) {
+    public function reject($ID)
+    {
 
 
         $currentUser = $this->session->userdata('login_user');
@@ -311,5 +321,26 @@ class Salary_Advance extends CI_Controller {
         $this->session->set_flashdata('success_message', 'Salary Advance successfully');
         redirect(base_url() . "Payroll/Salary_Advance");
     }
+    public function checkbasicsal()
+    {
+        $input = json_decode(file_get_contents("php://input"), true);
 
+        $empNo = isset($input['empNo']) ? $input['empNo'] : '';
+        $Sal_input = intval(isset($input['sal_adv'])) ? $input['sal_adv'] : '';
+
+        if (empty($empNo)) {
+            echo "0";
+        } else {
+            $data_sal = $this->Db_model->getfilteredData("select (60/100)*(Basic_Salary+Incentive+Fixed_Allowance) as totsal from tbl_empmaster where EmpNo='$empNo'");
+            
+            
+            $basicSal = intval($data_sal[0]->totsal);
+
+            if ($basicSal < $Sal_input) {
+                echo "1";
+            } else {
+                echo "2";
+            }
+        }
+    }
 }

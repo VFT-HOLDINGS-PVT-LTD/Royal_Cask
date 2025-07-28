@@ -13,6 +13,7 @@
     <head>
         <!-- Styles -->
         <?php $this->load->view('template/css.php'); ?>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 
 
     </head>
@@ -90,38 +91,41 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="form-group col-sm-6">
-                                                                        <label for="focusedinput" class="col-sm-4 control-label">Category</label>
-                                                                        <div class="col-sm-8">
-                                                                            <select class="form-control" required="" id="cmb_cat" name="cmb_cat" onchange="selctcity()">
-
-
-                                                                                <option value="" default>-- Select --</option>
-                                                                                <option value="Employee">Employee</option>
-                                                                                <option value="Department">Department</option>
-                                                                                <option value="Designation">Designation</option>
-                                                                                <option value="Employee_Group">Employee_Group</option>
-                                                                                <option value="Company">Company</option>   
-
-                                                                            </select>
-                                                                        </div>
-
+                                                                    <label for="focusedinput"
+                                                                        class="col-sm-4 control-label">Category</label>
+                                                                    <div class="col-sm-8">
+                                                                        <select class="form-control" required
+                                                                            id="cmb_cat" name="cmb_cat"
+                                                                            onchange="selctcity()">
+                                                                            <option value="" default>-- Select --
+                                                                            </option>
+                                                                            <option value="Employee">Employee
+                                                                            </option>
+                                                                            <!-- <option value="Department">Department
+                                                                            </option>
+                                                                            <option value="Designation">Designation
+                                                                            </option>
+                                                                            <option value="Employee_Group">
+                                                                                Employee_Group</option>
+                                                                            <option value="Company">Company</option> -->
+                                                                        </select>
                                                                     </div>
+                                                                </div>
 
+                                                                    <div id="dynamic-fields"></div>
                                                                     <div class="form-group col-sm-6">
-                                                                        <label for="focusedinput" id="change" class="col-sm-4 control-label"></label>
-                                                                        <div class="col-sm-8" id="cat_div">
-                                                                            <select class="form-control" required="" id="cmb_cat2" name="cmb_cat2" >
-
-                                                                            </select>
-                                                                        </div>
-
+                                                                    <label for="focusedinput"
+                                                                        class="col-sm-4 control-label">Advance
+                                                                        Amount</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" class="form-control"
+                                                                            onkeyup="checksaladv()" id="txt_advance"
+                                                                            name="txt_advance" placeholder="Ex: 15000">
+                                                                        <small id="error_message"
+                                                                            style="color: red; display: none;">Advance
+                                                                            cannot exceed basic salary!</small>
                                                                     </div>
-                                                                    <div class="form-group col-sm-6">
-                                                                        <label for="focusedinput" class="col-sm-4 control-label">Advance Amount</label>
-                                                                        <div class="col-sm-8">
-                                                                            <input type="text" class="form-control" id="txt_advance" name="txt_advance" placeholder="Ex: 15000">
-                                                                        </div>
-                                                                    </div>
+                                                                </div>
                                                                     <div class="form-group col-sm-6">
                                                                         <label for="focusedinput" class="col-sm-4 control-label">Month</label>
                                                                         <div class="col-sm-8">
@@ -471,7 +475,262 @@
 
 
                 });
-            </script>  
+            </script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('.itemName').select2({
+                    placeholder: '--- Find ---',
+                    ajax: {
+                        url: "<?php echo base_url(); ?>Leave_Transaction/Leave_Entry/search",
+                        dataType: 'json',
+                        delay: 250,
+                        processResults: function(data) {
+                            return {
+                                results: data
+                            };
+                        },
+                        cache: true
+                    }
+                });
+
+                $('#txt_nic').on('change', function() {
+                    var empNo = $(this).val();
+                    if (empNo) {
+                        $.ajax({
+                            url: '<?php echo base_url(); ?>Leave_Transaction/Leave_Entry/get_mem_data/' + empNo,
+                            type: "GET",
+                            dataType: "json",
+                            success: function(data) {
+                                if (data.length > 0) {
+                                    $('#txt_emp_name').val(data[0].Emp_Full_Name);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                $('#cmb_cat').on('change', function() {
+                    var selectedValue = $(this).val();
+                    var dynamicFields = $('#dynamic-fields');
+                    dynamicFields.empty();
+
+                    if (selectedValue === 'Employee') {
+                        dynamicFields.html(`
+                        <div class="form-group col-sm-6">
+                            <label for="" class="col-sm-4 control-label">Emp Number</label>
+                            <div class="col-sm-8">
+                                <select type="text" required="required" autocomplete="off" class="form-control txt_nic itemName" name="txt_nic" id="txt_nic" placeholder="">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="txt_emp_name" class="col-sm-4 control-label">Selected Emp Name</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="txt_emp_name" name="txt_emp_name" placeholder="Selected Emp Name" readonly>
+                            </div>
+                        </div>
+                    `);
+
+                        $('.itemName').select2({
+                            placeholder: '--- Find ---',
+                            ajax: {
+                                url: "<?php echo base_url(); ?>Leave_Transaction/Leave_Entry/search",
+                                dataType: 'json',
+                                delay: 250,
+                                processResults: function(data) {
+                                    return {
+                                        results: data
+                                    };
+                                },
+                                cache: true
+                            }
+                        });
+
+                        $('#txt_nic').on('change', function() {
+                            var empNo = $(this).val();
+                            if (empNo) {
+                                $.ajax({
+                                    url: '<?php echo base_url(); ?>Leave_Transaction/Leave_Entry/get_mem_data/' + empNo,
+                                    type: "GET",
+                                    dataType: "json",
+                                    success: function(data) {
+                                        if (data.length > 0) {
+                                            $('#txt_emp_name').val(data[0].Emp_Full_Name);
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        dynamicFields.html(`
+                        <div class="form-group col-sm-6">
+                            <label for="" class="col-sm-4 control-label">Select</label>
+                            <div class="col-sm-8" id="cat_div">
+                                <select class="form-control" required id="cmb_cat2" name="cmb_cat2">
+                                </select>
+                            </div>
+                        </div>
+                    `);
+
+                        $.post('<?php echo base_url(); ?>index.php/Pay/Allowance/dropdown/', {
+                            cmb_cat: selectedValue
+                        }, function(data) {
+                            $('#cmb_cat2').html(data);
+                        });
+                    }
+                });
+
+                $("#cmb_cat").trigger("change");
+            });
+        </script>  
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('.itemName').select2({
+                    placeholder: '--- Find ---',
+                    ajax: {
+                        url: "<?php echo base_url(); ?>Leave_Transaction/Leave_Entry/search",
+                        dataType: 'json',
+                        delay: 250,
+                        processResults: function(data) {
+                            return {
+                                results: data
+                            };
+                        },
+                        cache: true
+                    }
+                });
+
+                $('#txt_nic').on('change', function() {
+                    var empNo = $(this).val();
+                    if (empNo) {
+                        $.ajax({
+                            url: '<?php echo base_url(); ?>Leave_Transaction/Leave_Entry/get_mem_data/' + empNo,
+                            type: "GET",
+                            dataType: "json",
+                            success: function(data) {
+                                if (data.length > 0) {
+                                    $('#txt_emp_name').val(data[0].Emp_Full_Name);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                $('#cmb_cat').on('change', function() {
+                    var selectedValue = $(this).val();
+                    var dynamicFields = $('#dynamic-fields');
+                    dynamicFields.empty();
+
+                    if (selectedValue === 'Employee') {
+                        dynamicFields.html(`
+                        <div class="form-group col-sm-6">
+                            <label for="" class="col-sm-4 control-label">Emp Number</label>
+                            <div class="col-sm-8">
+                                <select type="text" required="required" autocomplete="off" class="form-control txt_nic itemName" name="txt_nic" id="txt_nic" placeholder="">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label for="txt_emp_name" class="col-sm-4 control-label">Selected Emp Name</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="txt_emp_name" name="txt_emp_name" placeholder="Selected Emp Name" readonly>
+                            </div>
+                        </div>
+                    `);
+
+                        $('.itemName').select2({
+                            placeholder: '--- Find ---',
+                            ajax: {
+                                url: "<?php echo base_url(); ?>Leave_Transaction/Leave_Entry/search",
+                                dataType: 'json',
+                                delay: 250,
+                                processResults: function(data) {
+                                    return {
+                                        results: data
+                                    };
+                                },
+                                cache: true
+                            }
+                        });
+
+                        $('#txt_nic').on('change', function() {
+                            var empNo = $(this).val();
+                            if (empNo) {
+                                $.ajax({
+                                    url: '<?php echo base_url(); ?>Leave_Transaction/Leave_Entry/get_mem_data/' + empNo,
+                                    type: "GET",
+                                    dataType: "json",
+                                    success: function(data) {
+                                        if (data.length > 0) {
+                                            $('#txt_emp_name').val(data[0].Emp_Full_Name);
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        dynamicFields.html(`
+                        <div class="form-group col-sm-6">
+                            <label for="" class="col-sm-4 control-label">Select</label>
+                            <div class="col-sm-8" id="cat_div">
+                                <select class="form-control" required id="cmb_cat2" name="cmb_cat2">
+                                </select>
+                            </div>
+                        </div>
+                    `);
+
+                        $.post('<?php echo base_url(); ?>index.php/Pay/Allowance/dropdown/', {
+                            cmb_cat: selectedValue
+                        }, function(data) {
+                            $('#cmb_cat2').html(data);
+                        });
+                    }
+                });
+
+                $("#cmb_cat").trigger("change");
+            });
+        </script>
+        <script>
+            function checksaladv() {
+
+                var empNo = $('#txt_nic').val();
+                var sal_adv = $('#txt_advance').val();
+
+                if (empNo == null) {
+                    alert("Please Select Employee");
+                } else {
+                    var payload = {
+                        "empNo": empNo,
+                        "sal_adv": sal_adv,
+                    };
+                    $.ajax({
+                        url: '<?php echo base_url(); ?>Pay/Salary_Advance/checkbasicsal',
+                        type: "POST",
+                        contentType: 'application/json',
+                        data: JSON.stringify(payload),
+                        success: function(response) {
+                            console.log(response);
+                            if (response == 1) {
+                                $("#error_message").show();
+                            } else if (response == 2) {
+                                $("#error_message").hide();
+                            } else if (response == 0) {
+                                $("#error_message").hide();
+                                alert("please Select Employee");
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Error in the request:', error);
+                            alert(
+                                'An error occurred while processing your request. Please check the console for more details.');
+                        }
+                    });
+                }
+
+            }
+        </script>
 
     </body>
 
