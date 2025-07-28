@@ -365,11 +365,16 @@ class Attendance_Manual_Entry extends CI_Controller
                     } else {
                         $formatted_time = $Missing_time; 
                     }
+                    if (is_numeric($Date)) {
+                        $formatted_date = Date::excelToDateTimeObject($Date)->format('Y-m-d');
+                    } else {
+                        $formatted_date = $Date; 
+                    }
                     // echo $formatted_time;
                     // echo "<br/>";
                     $data = array(
                         'Enroll_No' => $Emp_no,
-                        'Att_Date' => $Date,
+                        'Att_Date' => $formatted_date,
                         'In_Time' => $formatted_time,
                         'Status' => $Status,
 
