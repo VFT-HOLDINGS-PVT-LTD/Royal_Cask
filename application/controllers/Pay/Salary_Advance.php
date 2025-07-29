@@ -27,7 +27,11 @@ class Salary_Advance extends CI_Controller
         $this->load->helper('url');
         $data['title'] = "Salary Advance Entry | HRM SYSTEM";
         $data['data_emp'] = $this->Db_model->getData('EmpNo,Emp_Full_Name', 'tbl_empmaster');
-
+        $data['data_emp'] = $this->Db_model->getData('EmpNo,Emp_Full_Name', 'tbl_empmaster');
+        $data['data_dep'] = $this->Db_model->getData('Dep_ID,Dep_Name', 'tbl_departments');
+        $data['data_desig'] = $this->Db_model->getData('Des_ID,Desig_Name', 'tbl_designations');
+        $data['data_cmp'] = $this->Db_model->getData('Cmp_ID,Company_Name', 'tbl_companyprofile');
+        $data['data_group'] = $this->Db_model->getData('Grp_ID,EmpGroupName', 'tbl_emp_group');
 
 
 
@@ -188,9 +192,9 @@ class Salary_Advance extends CI_Controller
         $emp_name = $this->input->post("txt_emp_name");
         $desig = $this->input->post("cmb_desig");
         $dept = $this->input->post("cmb_dep");
-        $month = $this->input->post("cmb_month");
+        $month = $this->input->post("cmb_months");
         $cmb_year = $this->input->post("cmb_years");
-
+        $cmb_grp = $this->input->post("cmb_grp");
 
 
         // Filter Data by categories
@@ -198,48 +202,57 @@ class Salary_Advance extends CI_Controller
 
         if (($this->input->post("cmb_years"))) {
             if ($filter == '') {
-                $filter = " where  sal_ad.Year =$cmb_year";
+                $filter = " AND  sal_ad.Year ='$cmb_year'";
             } else {
-                $filter .= " AND  sal_ad.Year =$cmb_year";
+                $filter .= " AND  sal_ad.Year ='$cmb_year'";
             }
         }
 
-        if (($this->input->post("cmb_month"))) {
+        if (($this->input->post("cmb_months"))) {
             if ($filter == '') {
-                $filter = " where  sal_ad.Month =$month";
+                $filter = " AND  sal_ad.Month =$month";
             } else {
                 $filter .= " AND  sal_ad.Month =$month";
             }
         }
         if (($this->input->post("txt_emp"))) {
             if ($filter == null) {
-                $filter = " where v_alw.EmpNo =$emp";
+                $filter = " AND sal_ad.EmpNo =$emp";
             } else {
-                $filter .= " AND v_alw.EmpNo =$emp";
+                $filter .= " AND sal_ad.EmpNo =$emp";
             }
         }
 
         if (($this->input->post("txt_emp_name"))) {
             if ($filter == null) {
-                $filter = " where Emp.Emp_Full_Name ='$emp_name'";
+                $filter = " AND Emp.Emp_Full_Name ='$emp_name'";
             } else {
                 $filter .= " AND Emp.Emp_Full_Name ='$emp_name'";
             }
         }
         if (($this->input->post("cmb_desig"))) {
             if ($filter == null) {
-                $filter = " where dsg.Des_ID  ='$desig'";
+                $filter = " AND dsg.Des_ID  ='$desig'";
             } else {
                 $filter .= " AND dsg.Des_ID  ='$desig'";
             }
         }
         if (($this->input->post("cmb_dep"))) {
             if ($filter == null) {
-                $filter = " where dep.Dep_id  ='$dept'";
+                $filter = " AND dep.Dep_id  ='$dept'";
             } else {
                 $filter .= " AND dep.Dep_id  ='$dept'";
             }
         }
+        if (($this->input->post("cmb_grp"))) {
+            if ($filter == null) {
+                $filter = " AND grp.Grp_ID  ='$cmb_grp'";
+            } else {
+                $filter .= " AND grp.Grp_ID  ='$cmb_grp'";
+            }
+        }
+
+        // echo $filter;
 
 
         $data['data_set'] = $this->Db_model->getfilteredData("SELECT 
@@ -265,12 +278,15 @@ class Salary_Advance extends CI_Controller
                                                                     tbl_designations dsg ON dsg.Des_ID = Emp.Des_ID
                                                                         LEFT JOIN
                                                                     tbl_departments dep ON dep.Dep_id = Emp.Dep_id
+                                                                        INNER JOIN
+                                                                    tbl_emp_group grp ON grp.Grp_ID = Emp.Grp_ID
                                                                     where
                                                                     sal_ad.Is_pending = 0 and sal_ad.Is_Cancel=0
                                                                     {$filter} ");
 
 
         $this->load->view('Payroll/Salary_Advance/search_data', $data);
+        // echo $filter;
     }
 
     /*
@@ -332,8 +348,8 @@ class Salary_Advance extends CI_Controller
             echo "0";
         } else {
             $data_sal = $this->Db_model->getfilteredData("select (60/100)*(Basic_Salary+Incentive+Fixed_Allowance) as totsal from tbl_empmaster where EmpNo='$empNo'");
-            
-            
+
+
             $basicSal = intval($data_sal[0]->totsal);
 
             if ($basicSal < $Sal_input) {
@@ -342,5 +358,27 @@ class Salary_Advance extends CI_Controller
                 echo "2";
             }
         }
+    }
+    public function approveAll()
+    {
+        $ids = $this->input->post('ids');
+
+        // echo json_encode($ids);
+        $currentUser = $this->session->userdata('login_user');
+        $Emp = $currentUser[0]->EmpNo;
+        if (!empty($ids)) {
+            foreach ($ids as $ID) {
+                $data = array(
+                    'Is_pending' => 1,
+                    'Is_Approve' => 1,
+                    'Approved_by' => $Emp,
+                );
+
+                $whereArr = array("id" => $ID);
+                $result = $this->Db_model->updateData("tbl_salary_advance", $data, $whereArr);
+            }
+        }
+        $this->session->set_flashdata('success_message', 'Salary Advance Approved successfully');
+        redirect(base_url() . "Pay/Salary_Advance");
     }
 }
