@@ -107,7 +107,7 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                     $InTime = '';
                     $OutDate = '';
                     $OutTime = '';
-$Nopay = 0;
+                    $Nopay = 0;
                     $from_date = '';
                     $from_time = '';
                     $to_date = '';
@@ -547,7 +547,7 @@ $Nopay = 0;
 
                             //   dot naththan samanya process eka 
                         } else {
-                            
+
                             $min_time_to_ot = $settings[0]->Min_time_t_ot_e;
                             $dateTime = new DateTime($to_time);
                             $dateTime->add(new DateInterval('PT' . $min_time_to_ot . 'M'));
@@ -573,7 +573,6 @@ $Nopay = 0;
                                     $Nopay = 0;
                                     $Nopay_Hrs = 0;
                                 }
-                                
                             }
                         }
                     }
@@ -629,6 +628,17 @@ $Nopay = 0;
                         $Nopay = 0;
                         $Nopay_Hrs = 0;
                         $Day_Type = 0.5;
+                    }
+
+                    //
+                    if ($InDate == $OutDate && $OutTime < $InTime) {
+                        $DayStatus = 'MS';
+                        $Late_Status = 0;
+                        $Nopay = 0;
+                        $Nopay_Hrs = 0;
+                        $Day_Type = 0.5;
+                        $InTime = $OutTime;
+                        $OutTime = "00:00:00";
                     }
                     // **************************************************************************************//
 
