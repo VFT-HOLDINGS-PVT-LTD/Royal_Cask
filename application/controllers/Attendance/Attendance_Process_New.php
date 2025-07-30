@@ -290,8 +290,10 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                                 $dateTime = new DateTime($to_time);
                                 $dateTime->add(new DateInterval('PT' . $min_time_to_ot . 'M'));
                                 $shift_evning = $dateTime->format('H:i:s');
+                                $grassperiod_fromtime = $to_date ." ".$shift_evning;
+                                $grassperiod_totime = $OutDate . " " . $OutTime;
 
-                                if ($shift_evning < $OutTime) {
+                                if ($grassperiod_fromtime < $grassperiod_totime) {
                                     $fromtime = $to_date . " " . $to_time;
                                     $totime = $OutDate . " " . $OutTime;
                                     $timestamp1 = strtotime($fromtime);
