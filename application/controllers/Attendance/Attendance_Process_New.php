@@ -421,7 +421,7 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                                 }
                             }
                             if ($icalData2 >= 0) {
-                                $AfterShiftWH = $icalData2;
+                                $AfterShiftWH += $icalData2;
                             }
                         }
 
