@@ -84,6 +84,9 @@ class Shift_Allocation extends CI_Controller
     {
         $cat = $this->input->post('cmb_cat');
         $cat2 = $this->input->post('cmb_cat2');
+        if ($cat == 'Employee') {
+            $cat2 = $this->input->post('txt_nic');
+        }
         $filterColumn = [
             "Employee" => "EmpNo",
             "Department" => "Dep_ID",
@@ -120,7 +123,7 @@ class Shift_Allocation extends CI_Controller
             $Holiday = $this->Db_model->getfilteredData("SELECT COUNT(Hdate) AS HasRow FROM tbl_holidays WHERE Hdate = '$from_date_fmt'");
             $year = date("Y");
 
-            $ros = $this->Db_model->getfilteredData("SELECT ts.ShiftCode, tr.DayName, tr.ShiftType, ts.FromTime, ts.ToTime, ts.DayType, ts.ShiftGap, ts.NextDay FROM tbl_rosterpatternweeklydtl tr INNER JOIN tbl_shifts ts ON ts.ShiftCode = tr.ShiftCode WHERE tr.RosterCode = '$roster' AND tr.DayName = '$Current_date'");
+            $ros = $this->Db_model->getfilteredData("SELECT ts.ShiftCode, tr.DayName, tr.ShiftType, ts.FromTime, ts.ToTime, ts.DayType, ts.ShiftGap, ts.NextDay, ts.FHDSessionEndTime, ts.SHDSessionStartTime FROM tbl_rosterpatternweeklydtl tr INNER JOIN tbl_shifts ts ON ts.ShiftCode = tr.ShiftCode WHERE tr.RosterCode = '$roster' AND tr.DayName = '$Current_date'");
             $ros = $ros[0];
 
             $DayStatus = $ros->ShiftType === 'EX' ? 'EX' : ($Holiday[0]->HasRow == 1 ? 'HD' : 'AB');
@@ -145,6 +148,8 @@ class Shift_Allocation extends CI_Controller
                     'TDate' => $to_date_sh,
                     'TTime' => $ros->ToTime,
                     'ShType' => $ShiftType,
+                    'HDSession' => $ros->FHDSessionEndTime,
+                    'HDESession' => $ros->SHDSessionStartTime,
                     'DayStatus' => $DayStatus,
                     'GapHrs' => $ros->ShiftGap,
                     'GracePrd' => $GracePeriod,
