@@ -159,6 +159,13 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                         $dt_in_Records['dt_Records'] = $this->Db_model->getfilteredData("select min(AttTime) as INTime,Enroll_No,AttDate from tbl_u_attendancedata where Enroll_No = '$EmpNo' and AttDate='" . $FromDate . "' AND AttTime BETWEEN '15:00:00' AND '23:59:59' ");
                         $InDate = $dt_in_Records['dt_Records'][0]->AttDate;
                         $InTime = $dt_in_Records['dt_Records'][0]->INTime;
+                        $from_time = '20:00:00';
+                        $to_time = '08:00:00';
+                        $newDate = date('Y-m-d', strtotime($FromDate . ' +1 day'));
+                        $to_date = $newDate;
+                        if ($shift_day == 'Saturday') {
+                            $to_time = '01:00:00';
+                        }
                     }
                     //kalin dawase out eka edamada balanw 
                     $oldDate = date('Y-m-d', strtotime($FromDate . ' -1 day'));
@@ -289,7 +296,6 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                     }
 
                     if (!empty($dt_in_Records['dt_Records'][0]->INTime) && !empty($dt_out_Records['dt_out_Records'][0]->OutTime)) {
-                        echo "ok";
                         $InTime = $InTime_check_night_any;
                         $from_time = '20:00:00';
                         $to_time = '08:00:00';
@@ -1023,9 +1029,9 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                     // echo "<br/>";
                     // echo "<br/>";
                     // die;
-                    $data_arr = array("InRec" => 1, "InDate" => $FromDate, "InTime" => $InTime, "OutRec" => 1, "OutDate" => $OutDate, "OutTime" => $OutTime, "nopay" => $Nopay, "Is_processed" => 1, "DayStatus" => $DayStatus, "BeforeExH" => $BeforeShift, "Day_Type" => $Day_Type, "Lv_T_ID" => $leave_type, "AfterExH" => $AfterShiftWH, "LateSt" => $Late_Status, "LateM" => $lateM, "EarlyDepMin" => $ED, "NetLateM" => $NetLateM, "ApprovedExH" => $ApprovedExH, "nopay_hrs" => $Nopay_Hrs, "DOT" => $DOT);
-                    $whereArray = array("ID_roster" => $ID_Roster);
-                    $result = $this->Db_model->updateData("tbl_individual_roster", $data_arr, $whereArray);
+                    // $data_arr = array("InRec" => 1, "InDate" => $FromDate, "InTime" => $InTime, "OutRec" => 1, "OutDate" => $OutDate, "OutTime" => $OutTime, "nopay" => $Nopay, "Is_processed" => 1, "DayStatus" => $DayStatus, "BeforeExH" => $BeforeShift, "Day_Type" => $Day_Type, "Lv_T_ID" => $leave_type, "AfterExH" => $AfterShiftWH, "LateSt" => $Late_Status, "LateM" => $lateM, "EarlyDepMin" => $ED, "NetLateM" => $NetLateM, "ApprovedExH" => $ApprovedExH, "nopay_hrs" => $Nopay_Hrs, "DOT" => $DOT);
+                    // $whereArray = array("ID_roster" => $ID_Roster);
+                    // $result = $this->Db_model->updateData("tbl_individual_roster", $data_arr, $whereArray);
                 }
             }
             // }
