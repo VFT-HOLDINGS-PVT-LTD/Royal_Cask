@@ -209,7 +209,25 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                         }
                     }
 
-                    //out eka balanawa
+                    //mokk unath night shift ekt da ganna widiy
+                    $oldDate_night_check_any = date('Y-m-d', strtotime($FromDate . ' -1 day'));
+                    $dt_in_Records['dt_Records'] = $this->Db_model->getfilteredData("select AttTime as INTime,Enroll_No,AttDate from tbl_u_attendancedata where Enroll_No = '$EmpNo' and AttDate='" . $oldDate_night_check_any . "' AND AttTime BETWEEN '15:00:00' AND '23:59:59' AND Status = '0' ");
+                    if (!empty($dt_in_Records['dt_Records'][0]->INTime)) {
+                        $InDate_check_night_any = $dt_in_Records['dt_Records'][0]->AttDate;
+                        $InTime_check_night_any = $dt_in_Records['dt_Records'][0]->INTime;
+                    }
+
+                    $dt_out_Records['dt_out_Records'] = $this->Db_model->getfilteredData("select min(AttTime) as OutTime,Enroll_No,AttDate from tbl_u_attendancedata where Enroll_No='$EmpNo' and AttDate='$FromDate' AND AttTime <'09:00:00' AND Status = '1' ");
+                    if (!empty($dt_out_Records['dt_out_Records'][0]->OutTime)) {
+                        $OutTime_check_night_any = $dt_out_Records['dt_out_Records'][0]->OutTime;
+                        $OutDate_check_night_any = $dt_out_Records['dt_out_Records'][0]->AttDate;
+                    }
+
+                    if (!empty($InTime_check_night_any) && !empty($OutDate_check_night_any) && $InTime == $OutTime_check_night_any) {
+                        $InTime = null;
+                    }
+
+                    //out eka balanawa  ***********************************************************
                     $dt_out_Records['dt_out_Records'] = $this->Db_model->getfilteredData("select max(AttTime) as OutTime,Enroll_No,AttDate from tbl_u_attendancedata where Enroll_No = '$EmpNo' and AttDate='" . $FromDate . "' AND AttTime BETWEEN '10:00:00' AND '23:59:59' AND AttTime != '$InTime' ");
                     $OutDate = $dt_out_Records['dt_out_Records'][0]->AttDate;
                     $OutTime = $dt_out_Records['dt_out_Records'][0]->OutTime;
@@ -255,6 +273,33 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                         }
                     }
 
+                    //mokk unath night shift ekt da ganna widiy
+
+                    $dt_in_Records['dt_Records'] = $this->Db_model->getfilteredData("select AttTime as INTime,Enroll_No,AttDate from tbl_u_attendancedata where Enroll_No = '$EmpNo' and AttDate='" . $FromDate . "' AND AttTime BETWEEN '15:00:00' AND '23:59:59' AND Status = '0' ");
+                    if (!empty($dt_in_Records['dt_Records'][0]->INTime)) {
+                        $InDate_check_night_any = $dt_in_Records['dt_Records'][0]->AttDate;
+                        $InTime_check_night_any = $dt_in_Records['dt_Records'][0]->INTime;
+                    }
+
+                    $newDate = date('Y-m-d', strtotime($FromDate . ' +1 day'));
+                    $dt_out_Records['dt_out_Records'] = $this->Db_model->getfilteredData("select min(AttTime) as OutTime,Enroll_No,AttDate from tbl_u_attendancedata where Enroll_No='$EmpNo' and AttDate='$newDate' AND AttTime <'09:00:00' AND Status = '1' ");
+                    if (!empty($dt_out_Records['dt_out_Records'][0]->OutTime)) {
+                        $OutTime_check_night_any = $dt_out_Records['dt_out_Records'][0]->OutTime;
+                        $OutDate_check_night_any = $dt_out_Records['dt_out_Records'][0]->AttDate;
+                    }
+
+                    if (!empty($dt_in_Records['dt_Records'][0]->INTime) && !empty($dt_out_Records['dt_out_Records'][0]->OutTime)) {
+                        echo "ok";
+                        $InTime = $InTime_check_night_any;
+                        $from_time = '20:00:00';
+                        $to_time = '08:00:00';
+                        $to_date = $newDate;
+                        $OutDate = $OutDate_check_night_any;
+                        $OutTime = $OutTime_check_night_any;
+                        if ($shift_day == 'Saturday') {
+                            $to_time = '01:00:00';
+                        }
+                    }
                     //duty dawasaska samnyen yana widiya
                     if ($shift_type == "DU") {
                         $DayStatus = '';
@@ -290,7 +335,7 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                                 $dateTime = new DateTime($to_time);
                                 $dateTime->add(new DateInterval('PT' . $min_time_to_ot . 'M'));
                                 $shift_evning = $dateTime->format('H:i:s');
-                                $grassperiod_fromtime = $to_date ." ".$shift_evning;
+                                $grassperiod_fromtime = $to_date . " " . $shift_evning;
                                 $grassperiod_totime = $OutDate . " " . $OutTime;
 
                                 if ($grassperiod_fromtime < $grassperiod_totime) {
@@ -487,6 +532,11 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                             //   dot naththan samanya process eka 
                         } else {
 
+                            if (empty($InTime) || empty($OutTime)) {
+                                $InTime = null;
+                                $OutTime = null;
+                            }
+
                             $min_time_to_ot = $settings[0]->Min_time_t_ot_e;
                             $dateTime = new DateTime($to_time);
                             $dateTime->add(new DateInterval('PT' . $min_time_to_ot . 'M'));
@@ -549,7 +599,10 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
 
                             //   dot naththan samanya process eka 
                         } else {
-
+                            if (empty($InTime) || empty($OutTime)) {
+                                $InTime = null;
+                                $OutTime = null;
+                            }
                             $min_time_to_ot = $settings[0]->Min_time_t_ot_e;
                             $dateTime = new DateTime($to_time);
                             $dateTime->add(new DateInterval('PT' . $min_time_to_ot . 'M'));
@@ -903,86 +956,86 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                     //     $Day_Type = $shift_day;
                     // }
 
-                    // echo $ID_Roster;
+                    echo $ID_Roster;
+                    echo "<br/>";
+                    echo $EmpNo;
+                    echo "<br/>";
+                    echo $FromDate;
+                    echo "<br/>";
+                    echo "from date-" . $from_date;
+                    echo "<br/>";
+                    echo "from time-" . $from_time;
+                    echo "<br/>";
+                    echo "in date-" . $InDate;
+                    echo "<br/>";
+                    echo "in time-" . $InTime;
+                    echo "<br/>";
+                    echo "<br/>";
+                    echo "to date-" . $to_date;
+                    echo "<br/>";
+                    echo "to time-" . $to_time;
+                    echo "<br/>";
+                    echo "out date-" . $OutDate;
+                    echo "<br/>";
+                    echo "out time-" . $OutTime;
+                    echo "<br/>";
+                    echo "Late " . $lateM;
+                    echo "<br/>";
+                    echo "ED " . $ED;
+                    echo "<br/>";
+                    echo "DayStatus " . $DayStatus;
+                    echo "<br/>";
+                    echo "OT " . $AfterShiftWH;
+                    echo "<br/>";
+                    echo "dot" . $DOT;
+                    echo "<br/>";
+                    echo "sht" . $shift_type;
+                    echo "<br/>";
+                    echo "np " . $Nopay;
+                    echo "<br/>";
+                    echo "Day Type " . $Day_Type;
+                    echo "<br/>";
+                    echo "Day" . $shift_day;
+                    echo "<br/>";
+                    // echo "out 3-" . $OutTime3;
                     // echo "<br/>";
-                    // echo $EmpNo;
+                    // echo "workhours1-" . $workhours1;
                     // echo "<br/>";
-                    // echo $FromDate;
+                    // echo "workhours2-" . $workhours2;
                     // echo "<br/>";
-                    // echo "from date-" . $from_date;
+                    // echo "workhours3-" . $workhours3;
                     // echo "<br/>";
-                    // echo "from time-" . $from_time;
+                    // echo "workhours3-" . $workhours;
                     // echo "<br/>";
-                    // echo "in date-" . $InDate;
+                    // echo "dot1-" . $DOT1;
                     // echo "<br/>";
-                    // echo "in time-" . $InTime;
+                    // echo "dot2-" . $DOT2;
                     // echo "<br/>";
+                    // echo "dot3-" . $DOT3;
                     // echo "<br/>";
-                    // echo "to date-" . $to_date;
+                    // echo "dot-" . $DOT;
                     // echo "<br/>";
-                    // echo "to time-" . $to_time;
+                    // echo "out" . $OutTime;
                     // echo "<br/>";
-                    // echo "out date-" . $OutDate;
-                    // echo "<br/>";
-                    // echo "out time-" . $OutTime;
-                    // echo "<br/>";
-                    // echo "Late " . $lateM;
-                    // echo "<br/>";
-                    // echo "ED " . $ED;
-                    // echo "<br/>";
-                    // echo "DayStatus " . $DayStatus;
-                    // echo "<br/>";
-                    // echo "OT " . $AfterShiftWH;
-                    // echo "<br/>";
-                    // echo "dot" . $DOT;
-                    // echo "<br/>";
-                    // echo "sht" . $shift_type;
-                    // echo "<br/>";
-                    // echo "np " . $Nopay;
-                    // echo "<br/>";
-                    // echo "Day Type " . $Day_Type;
-                    // echo "<br/>";
-                    // echo "Day" . $shift_day;
-                    // echo "<br/>";
-                    // // echo "out 3-" . $OutTime3;
-                    // // echo "<br/>";
-                    // // echo "workhours1-" . $workhours1;
-                    // // echo "<br/>";
-                    // // echo "workhours2-" . $workhours2;
-                    // // echo "<br/>";
-                    // // echo "workhours3-" . $workhours3;
-                    // // echo "<br/>";
-                    // // echo "workhours3-" . $workhours;
-                    // // echo "<br/>";
-                    // // echo "dot1-" . $DOT1;
-                    // // echo "<br/>";
-                    // // echo "dot2-" . $DOT2;
-                    // // echo "<br/>";
-                    // // echo "dot3-" . $DOT3;
-                    // // echo "<br/>";
-                    // // echo "dot-" . $DOT;
-                    // // echo "<br/>";
-                    // // echo "out" . $OutTime;
-                    // // echo "<br/>";
-                    // // echo "outd-" . $OutDate;
-                    // echo "<br/>";
-                    // echo "<br/>";
-                    // echo "<br/>";
-                    // echo "<br/>";
+                    // echo "outd-" . $OutDate;
+                    echo "<br/>";
+                    echo "<br/>";
+                    echo "<br/>";
+                    echo "<br/>";
                     // die;
-                    $data_arr = array("InRec" => 1, "InDate" => $FromDate, "InTime" => $InTime, "OutRec" => 1, "OutDate" => $OutDate, "OutTime" => $OutTime, "nopay" => $Nopay, "Is_processed" => 1, "DayStatus" => $DayStatus, "BeforeExH" => $BeforeShift, "Day_Type" => $Day_Type, "Lv_T_ID" => $leave_type, "AfterExH" => $AfterShiftWH, "LateSt" => $Late_Status, "LateM" => $lateM, "EarlyDepMin" => $ED, "NetLateM" => $NetLateM, "ApprovedExH" => $ApprovedExH, "nopay_hrs" => $Nopay_Hrs, "DOT" => $DOT);
-                    $whereArray = array("ID_roster" => $ID_Roster);
-                    $result = $this->Db_model->updateData("tbl_individual_roster", $data_arr, $whereArray);
+                    // $data_arr = array("InRec" => 1, "InDate" => $FromDate, "InTime" => $InTime, "OutRec" => 1, "OutDate" => $OutDate, "OutTime" => $OutTime, "nopay" => $Nopay, "Is_processed" => 1, "DayStatus" => $DayStatus, "BeforeExH" => $BeforeShift, "Day_Type" => $Day_Type, "Lv_T_ID" => $leave_type, "AfterExH" => $AfterShiftWH, "LateSt" => $Late_Status, "LateM" => $lateM, "EarlyDepMin" => $ED, "NetLateM" => $NetLateM, "ApprovedExH" => $ApprovedExH, "nopay_hrs" => $Nopay_Hrs, "DOT" => $DOT);
+                    // $whereArray = array("ID_roster" => $ID_Roster);
+                    // $result = $this->Db_model->updateData("tbl_individual_roster", $data_arr, $whereArray);
                 }
             }
             // }
-            $this->session->set_flashdata('success_message', 'Attendance Process successfully');
-            redirect('/Attendance/Attendance_Process_New');
+            // $this->session->set_flashdata('success_message', 'Attendance Process successfully');
+            // redirect('/Attendance/Attendance_Process_New');
         } else {
-            $this->session->set_flashdata('success_message', 'Attendance Process successfully');
-            redirect('/Attendance/Attendance_Process_New');
+            // $this->session->set_flashdata('success_message', 'Attendance Process successfully');
+            // redirect('/Attendance/Attendance_Process_New');
         }
-        $this->session->set_flashdata('success_message', 'Attendance Process successfully');
-        redirect('/Attendance/Attendance_Process_New');
+        // $this->session->set_flashdata('success_message', 'Attendance Process successfully');
+        // redirect('/Attendance/Attendance_Process_New');
     }
 }
