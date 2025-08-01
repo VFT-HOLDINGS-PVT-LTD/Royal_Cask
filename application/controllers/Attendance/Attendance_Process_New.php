@@ -275,8 +275,13 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                         if ($from_time == '20:00:00') {
                             $newDate = date('Y-m-d', strtotime($FromDate . ' +1 day'));
                             $dt_out_Records['dt_out_Records'] = $this->Db_model->getfilteredData("select min(AttTime) as OutTime,Enroll_No,AttDate from tbl_u_attendancedata where Enroll_No='$EmpNo' and AttDate='$newDate' AND AttTime <'09:00:00'");
-                            $OutDate = $dt_out_Records['dt_out_Records'][0]->AttDate;
-                            $OutTime = $dt_out_Records['dt_out_Records'][0]->OutTime;
+                            if (empty($dt_out_Records['dt_out_Records'][1]->AttDate)) {
+                                $OutDate = null;
+                                $OutTime = null;
+                            } else {
+                                $OutDate = $dt_out_Records['dt_out_Records'][0]->AttDate;
+                                $OutTime = $dt_out_Records['dt_out_Records'][0]->OutTime;
+                            }
                         }
                     }
 
