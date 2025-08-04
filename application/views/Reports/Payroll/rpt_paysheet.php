@@ -103,7 +103,7 @@ foreach ($departments as $departmentName => $empList) {
         $html .= '<td>' . number_format($info->Basic_sal, 2) . '</td>';
         $html .= '<td>' . number_format($info->Br_pay, 2) . '</td>';
         $html .= '<td>' . number_format($info->Other_OT, 2) . '</td>';
-        $html .= '<td>' . number_format($info->Basic_pay, 2) . '</td>';
+        $html .= '<td>' . number_format($info->Total_F_Epf, 2) . '</td>';
 
         // Allowance values dynamically inserted
         foreach ($allowanceNames as $alw) {
