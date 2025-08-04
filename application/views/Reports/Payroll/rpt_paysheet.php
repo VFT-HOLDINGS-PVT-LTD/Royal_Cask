@@ -116,7 +116,7 @@ foreach ($departments as $departmentName => $empList) {
         $html .= '<td>' . number_format($info->Loan_Instalment, 2) . '</td>';
         $html .= '<td>' . number_format($info->no_pay_deduction, 2) . '</td>';
         $html .= '<td>' . number_format($info->Late_deduction, 2) . '</td>';
-        $html .= '<td>' . number_format($info->Wellfare, 2) . '</td>';
+        $html .= '<td>' . number_format($info->Ed_deduction, 2) . '</td>';
         $html .= '<td>' . number_format($info->Stamp_duty, 2) . '</td>';
         $html .= '<td>' . number_format($info->EPF_Worker_Amount, 2) . '</td>';
 

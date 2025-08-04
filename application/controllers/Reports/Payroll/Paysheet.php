@@ -82,6 +82,7 @@ public function Pay_sheet_Report_By_Cat(){
                     tbl_empmaster.Emp_Full_Name,
                     tbl_salary.Incentive,
                     tbl_salary.Late_deduction,
+                    tbl_salary.Ed_deduction,
                     tbl_salary.EPFNO,
                     tbl_salary.Br_pay,
                     tbl_salary.Total_F_Epf,
