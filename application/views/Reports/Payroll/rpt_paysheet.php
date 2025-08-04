@@ -94,7 +94,7 @@ foreach ($departments as $departmentName => $empList) {
         $deductions = $empData['deductions'];
 
         // Calculate balance as an example (you can customize)
-        $balance = $info->Net_salary - $info->Salary_advance;
+        $balance = $info->Net_salary;
 
         $html .= '<tr>';
         $html .= '<td>' . htmlspecialchars($info->EmpNo) . '</td>';
