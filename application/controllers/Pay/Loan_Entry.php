@@ -79,7 +79,7 @@ class Loan_Entry extends CI_Controller {
 
         $cat = $this->input->post('cmb_cat');
         if ($cat == "Employee") {
-            $cat2 = $this->input->post('cmb_cat2');
+            $cat2 = $this->input->post('txt_nic');
             $string = "SELECT EmpNo FROM tbl_empmaster WHERE EmpNo='$cat2'";
             $EmpData = $this->Db_model->getfilteredData($string);
         }
