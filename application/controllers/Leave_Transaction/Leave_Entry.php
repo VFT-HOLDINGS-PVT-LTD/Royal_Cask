@@ -1,10 +1,12 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Leave_Entry extends CI_Controller {
+class Leave_Entry extends CI_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         if (!($this->session->userdata('login_user'))) {
             redirect(base_url() . "");
@@ -19,7 +21,8 @@ class Leave_Entry extends CI_Controller {
      * Index page
      */
 
-    public function index() {
+    public function index()
+    {
 
         $data['title'] = "Leave Entry | HRM System";
         $data['data_set'] = $this->Db_model->getData('EmpNo,Emp_Full_Name', 'tbl_empmaster');
@@ -31,7 +34,8 @@ class Leave_Entry extends CI_Controller {
      * Check Leave Balance
      */
 
-    public function check_Leave() {
+    public function check_Leave()
+    {
 
 
         $cat = $this->input->post('cmb_cat2');
@@ -45,7 +49,8 @@ class Leave_Entry extends CI_Controller {
      * Dependent Dropdown
      */
 
-    public function dropdown() {
+    public function dropdown()
+    {
 
         $cat = $this->input->post('cmb_cat');
 
@@ -63,7 +68,8 @@ class Leave_Entry extends CI_Controller {
      * Insert Leave Data
      */
 
-    public function insert_data() {
+    public function insert_data()
+    {
 
         $currentUser = $this->session->userdata('login_user');
         $ApproveUser = $currentUser[0]->EmpNo;
@@ -71,7 +77,7 @@ class Leave_Entry extends CI_Controller {
 
         $cat = $this->input->post('cmb_cat');
         if ($cat == "Employee") {
-            $cat2 = $this->input->post('cmb_cat2');
+            $cat2 = $this->input->post('txt_nic');
             $string = "SELECT EmpNo FROM tbl_empmaster WHERE EmpNo='$cat2' and Status = 1";
             $EmpData = $this->Db_model->getfilteredData($string);
         }
@@ -94,13 +100,18 @@ class Leave_Entry extends CI_Controller {
         $Day_type = $this->input->post('cmb_day');
 
 
-//        var_dump($Day_type);die;
+        //        var_dump($Day_type);die;
 
         $orderdate = explode('/', $orderdate);
         $year = $orderdate[0];
         $month = $orderdate[1];
 
-        $Emp = $EmpData[0]->EmpNo;
+        if (empty($EmpData[0]->EmpNo)) {
+            $this->session->set_flashdata('error_message', 'Employee is Inactive');
+            redirect('/Leave_Transaction/Leave_Entry/');
+        } else {
+            $Emp = $EmpData[0]->EmpNo;
+        }
 
         $d1 = new DateTime($from_date);
         $d2 = new DateTime($to_date);
@@ -112,19 +123,19 @@ class Leave_Entry extends CI_Controller {
         $DaysInc = $d2->diff($d1)->days;
         ++$DaysInc;
 
-        var_dump($DaysInc);
+        // var_dump($DaysInc);
 
         /*
          * Check If Selected Employee have Allocated Leave in Leave Allocation Table
          */
         $IsAllocate = $this->Db_model->getfilteredData("select count(EmpNo) as IsAllocate from tbl_leave_allocation where EmpNo=$Emp ");
 
-//        $IsBalance = $this->Db_model->getfilteredData("select count(Balance) as Balance_lv from tbl_leave_allocation where EmpNo= $Emp and Balance >=$DaysInc");
+        //        $IsBalance = $this->Db_model->getfilteredData("select count(Balance) as Balance_lv from tbl_leave_allocation where EmpNo= $Emp and Balance >=$DaysInc");
         $IsBalance = $this->Db_model->getfilteredData("select Balance from tbl_leave_allocation where EmpNo= $Emp and Lv_T_ID=$leave_type and Balance >=$DaysInc");
 
         // var_dump($Emp, $leave_type, $DaysInc);
-//        echo 'ssssss';
-//        var_dump($IsBalance);die;
+        //        echo 'ssssss';
+        //        var_dump($IsBalance);die;
 
         /*
          * Get Individual Roster ID in Selected Date
@@ -135,12 +146,13 @@ class Leave_Entry extends CI_Controller {
         // var_dump($from_date, $to_date, $Emp);
 
 
-//        var_dump($Roster_ID_S);
-//        die;
+        //        var_dump($Roster_ID_S);
+        //        die;
 
         if ($IsAllocate[0]->IsAllocate == 0) {
             $this->session->set_flashdata('error_message', 'Employee does not have Allocated Leaves');
-        } if ($IsBalance[0]->Balance == 0) {
+        }
+        if ($IsBalance[0]->Balance == 0) {
             $this->session->set_flashdata('error_message', 'Employee Required Leave Balanve Not Enough');
         } else {
 
@@ -179,8 +191,9 @@ class Leave_Entry extends CI_Controller {
                         'Month' => $month,
                         'Reason' => $reason,
                         'Trans_time' => $timestamp,
-                    //    'ID_Roster' => $Roster_ID[0]->ID_Roster
-                ));
+                        //    'ID_Roster' => $Roster_ID[0]->ID_Roster
+                    )
+                );
 
                 $HasR = $this->Db_model->getfilteredData("select count(EmpNo) as HasRow from tbl_leave_entry where EmpNo = '$Emp' and Leave_Date = '$from_date' ");
 
@@ -197,7 +210,7 @@ class Leave_Entry extends CI_Controller {
 
                     $Day_type_Int = (float) $Day_type;
 
-//                    var_dump($Day_type_Int);die;
+                    //                    var_dump($Day_type_Int);die;
 
                     /*
                      * Update Individual Roster Table Is Leave status and Leave Type
@@ -211,7 +224,7 @@ class Leave_Entry extends CI_Controller {
                      * Get Leave Balance and Used by Employee No | Year | Leave Type
                      */
                     $Balance_Usd = $this->Db_model->getfilteredData("select Balance,Used,Lv_T_ID from tbl_leave_allocation where EmpNo=$Emp and Year=$year and Lv_T_ID=$leave_type ");
-//                    var_dump($Balance_Usd);die;
+                    //                    var_dump($Balance_Usd);die;
                     $Balance = $Balance_Usd[0]->Balance - $Day_type;
 
 
@@ -242,6 +255,7 @@ class Leave_Entry extends CI_Controller {
             $this->db->like('EmpNo', $this->input->get("q"));
             $query = $this->db->select('EmpNo as id, EmpNo as text')
                 ->limit(10)
+                ->where("Status = '1'")
                 ->get("tbl_empmaster");
             $json = $query->result();
         }
@@ -254,5 +268,4 @@ class Leave_Entry extends CI_Controller {
         $result = $this->Db_model->getfilteredData("select * from tbl_empmaster where EmpNo = '$id1'");
         echo json_encode($result);
     }
-
 }

@@ -127,7 +127,7 @@ class Shift_Allocation extends CI_Controller
             $ros = $ros[0];
 
             $DayStatus = $ros->ShiftType === 'EX' ? 'EX' : ($Holiday[0]->HasRow == 1 ? 'HD' : 'AB');
-            $ShiftType = $Holiday[0]->HasRow == 1 ? 'EX' : $ros->ShiftType;
+            $ShiftType = $Holiday[0]->HasRow == 1 ? 'HD' : $ros->ShiftType;
             $NoPay = ($ShiftType === 'EX') ? 0 : ($Holiday[0]->HasRow == 1 ? 0 : 1);
             $to_date_sh = $ros->NextDay == 1 ? date('Y-m-d H:i:s', strtotime($from_date . ' +1 day')) : $from_date;
 
