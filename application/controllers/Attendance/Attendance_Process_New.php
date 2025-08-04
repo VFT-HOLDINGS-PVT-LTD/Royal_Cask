@@ -967,7 +967,7 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                         $Day_Type = $shift_Day_type;
                     }
                     if ($InTime == '' && $OutTime == '' && $shift_type == 'EX') {
-                        $DayStatus = 'AB';
+                        $DayStatus = 'OFF';
                         $Nopay = 0;
                         $Nopay_Hrs = (((strtotime($to_time) - strtotime($from_time))) / 60);
                         $Day_Type = $shift_Day_type;

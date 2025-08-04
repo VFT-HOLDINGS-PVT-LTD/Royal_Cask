@@ -96,6 +96,7 @@ public function Pay_sheet_Report_By_Cat(){
                     tbl_salary.no_pay_deduction,
                     tbl_salary.Normal_OT_Hrs,
                     tbl_salary.Normal_OT_Pay,
+                    tbl_salary.Other_OT,
                     tbl_salary.Double_OT_Hrs,
                     tbl_salary.Double_OT_Pay,
                     tbl_salary.EPF_Worker_Rate,

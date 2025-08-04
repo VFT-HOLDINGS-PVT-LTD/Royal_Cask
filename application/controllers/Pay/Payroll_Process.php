@@ -37,16 +37,18 @@ class Payroll_Process extends CI_Controller
 
         $finalPayroll = [];
 
-        $HasmsRow_MS = $this->Db_model->getfilteredData("select COUNT(tbl_individual_roster.EmpNo) AS misspunch from tbl_individual_roster where EmpNo='$EmpNo' 
-            and EXTRACT(MONTH FROM FDate)='$month' and EXTRACT(YEAR FROM FDate)='$year' AND DayStatus = 'MS'");
-        if ($HasmsRow_MS[0]->misspunch == 0) {
-            foreach ($employees as $emp) {
 
-                $EmpNo = (int) $emp->EmpNo;
-                $Dep_ID = (int) $emp->Dep_ID;
-                $Des_ID = (int) $emp->Des_ID;
-                $Grp_ID = (int) $emp->Grp_ID;
+        foreach ($employees as $emp) {
 
+            $EmpNo = (int) $emp->EmpNo;
+            $Dep_ID = (int) $emp->Dep_ID;
+            $Des_ID = (int) $emp->Des_ID;
+            $Grp_ID = (int) $emp->Grp_ID;
+
+            $HasmsRow_MS = $this->Db_model->getfilteredData("select COUNT(tbl_individual_roster.EmpNo) AS misspunch from tbl_individual_roster where EmpNo='$EmpNo' 
+                and EXTRACT(MONTH FROM FDate)='$month' and EXTRACT(YEAR FROM FDate)='$year' AND DayStatus = 'MS'");
+            if ($HasmsRow_MS[0]->misspunch == 0) {
+                // echo $EmpNo;
                 // Get Department Name
                 $dep = $this->Db_model->getfilteredData("SELECT Dep_Name FROM tbl_departments WHERE Dep_ID = $Dep_ID");
                 $DepName = isset($dep[0]->Dep_Name) ? $dep[0]->Dep_Name : 'Unknown';
@@ -164,6 +166,17 @@ class Payroll_Process extends CI_Controller
                 // Total Night Overtime hours
                 $N_OT_Hours = $Overtime[0]->N_OT ?? 0;
 
+                // Get Overtime unites
+                $Overtime_unites = $this->Db_model->getfilteredData("
+                SELECT SUM(MODExtra) AS N_OT_units 
+                FROM tbl_individual_roster 
+                WHERE EmpNo = '$EmpNo' 
+                AND EXTRACT(MONTH FROM FDate) = $month 
+                AND EXTRACT(YEAR FROM FDate) = $year
+            ");
+                // Total Night Overtime hours
+                $N_OT_Unites = $Overtime_unites[0]->N_OT_units ?? 0;
+
                 // Get Late Minutes
                 $Late_Min = $this->Db_model->getfilteredData("
                 SELECT SUM(LateM) AS LateMin 
@@ -189,6 +202,7 @@ class Payroll_Process extends CI_Controller
                 $Early_Dep_Minutes = $earlyDeparture[0]->ed ?? 0;
 
                 $OT_Results = $this->calculateOvertime($emp->Basic_Salary, $FixedAllowancesAmount, $N_OT_Hours, $D_OT_Hours, $setting);
+                $OT_Results_unites = $this->calculateOvertime_unites($emp->Basic_Salary, $FixedAllowancesAmount, $N_OT_Unites, $setting);
                 $Late_Amount = $this->calculateLateDeduction($emp->Basic_Salary, $Late_Minutes, $setting);
                 $EarlyDep_Amount = $this->calculateEarlyDepartureDeduction($emp->Basic_Salary, $Early_Dep_Minutes, $setting);
                 $Festival_Adavance = $this->processFestivalAdvance($EmpNo, $month, $year);
@@ -218,6 +232,7 @@ class Payroll_Process extends CI_Controller
                     $Loan_Amount,
                     $halfday_day_amount,
                     $BataAllowance,
+                    $OT_Results_unites,
                     $setting
 
                 );
@@ -295,9 +310,11 @@ class Payroll_Process extends CI_Controller
                     'STAMP_D' => number_format($salaryData['Stamp_duty'], 2),
                     'BALANCE' => number_format($salaryData['D_Salary'], 2),
                     'DEDUCT_1' => number_format($salaryData['Deduct_1'], 2),
+                    'Other_OT' => number_format($salaryData['Other_OT'], 2),
                 ];
             }
         }
+
 
 
 
@@ -341,6 +358,7 @@ class Payroll_Process extends CI_Controller
         $Loan_Amount,
         $halfday_day_amount,
         $BataAllowance,
+        $OT_Results_unites,
         $Setting
 
     ) {
@@ -348,7 +366,7 @@ class Payroll_Process extends CI_Controller
         // Calculate TotalForEPF
         $TotalForEPF = $BasicSal + $BR1 + $BR2 + $Incentive;
 
-        $GrossSal = $TotalForEPF + $VariableAllowancesAmount + $FixedAllowancesAmount + $OT_Results['normal'] + $OT_Results['double'] + $BataAllowance;
+        $GrossSal = $TotalForEPF + $VariableAllowancesAmount + $FixedAllowancesAmount + $OT_Results_unites['ot_unites_amount'] + $OT_Results['double'] + $BataAllowance;
 
         //calculate nopay deduction
         $NopayRate = $BasicSal / 30; // Assuming 30 days in a month
@@ -402,6 +420,7 @@ class Payroll_Process extends CI_Controller
             'Loan_Instalment' => $Loan_Amount,
             'Festivel_Advance' => $Festival_Adavance,
             'Deduct_1' => $halfday_day_amount,
+            'Other_OT' => $OT_Results_unites['ot_unites_amount'],
             'Allowance_1' => $BataAllowance
         ];
         // echo "basic salary " . $BasicSal;
@@ -446,8 +465,8 @@ class Payroll_Process extends CI_Controller
         // echo "<br/>";
         // echo "net  " . $NetSalary;
         // echo "<br/>";
-        // // // echo "out 3-" . $OutTime3;
-        // // // echo "<br/>";
+        // echo "ot unites price " . $OT_Results_unites['ot_unites_amount'];
+        // echo "<br/>";
         // // // echo "workhours1-" . $workhours1;
         // // // echo "<br/>";
         // // // echo "workhours2-" . $workhours2;
@@ -777,6 +796,31 @@ class Payroll_Process extends CI_Controller
                 'double' => $D_OT_Amount,
                 'normal_hours' => $N_OT_Hours,
                 'double_hours' => $D_OT_Hours
+            ];
+        }
+    }
+
+    private function calculateOvertime_unites($BasicSal, $Fixed_Allowance, $N_OT_unites, $Setting)
+    {
+        if ($Setting[0]->Is_Ot_Fixed_Amount_Rate == 1) {
+            echo "ot munites " . $N_OT_unites;
+            echo "<br/>";
+
+            $OT_Rate = $Setting[0]->Ot_Rate;
+            $N_OT_Amount = ($OT_Rate / 2) * $N_OT_unites;
+            return [
+                'ot_unites_amount' => $N_OT_Amount
+            ];
+        } else {
+            $OT_Rate = (($BasicSal) / 270) * 1.5;
+            $OT_Rate_2 = (($BasicSal) / 270) * 2;
+
+            $N_OT_Amount = ($OT_Rate / 2) * $N_OT_unites;
+            // $D_OT_Amount = $OT_Rate_2 * ($D_OT_Hours / 60);
+            echo "ot munites " . $N_OT_unites;
+            echo "<br/>";
+            return [
+                'ot_unites_amount' => $N_OT_Amount
             ];
         }
     }

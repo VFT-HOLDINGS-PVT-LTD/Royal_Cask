@@ -55,6 +55,7 @@ foreach ($departments as $departmentName => $empList) {
                 <th>NAME</th>
                 <th>BASIC</th>
                 <th>BR</th>
+                <th>OT</th>
                 <th>FOR EPF</th>';
 
     // Allowance headers
@@ -65,6 +66,7 @@ foreach ($departments as $departmentName => $empList) {
     $html .= '
                 <th>GROSS PAY</th>
                 <th>ADV.PAID</th>
+                <th>LOAN</th>
                 <th>NO PAY</th>
                 <th>LATE</th>
                 <th>ED</th>
@@ -100,6 +102,7 @@ foreach ($departments as $departmentName => $empList) {
         $html .= '<td style="text-align:left;">' . htmlspecialchars($info->Emp_Full_Name) . '</td>';
         $html .= '<td>' . number_format($info->Basic_sal, 2) . '</td>';
         $html .= '<td>' . number_format($info->Br_pay, 2) . '</td>';
+        $html .= '<td>' . number_format($info->Other_OT, 2) . '</td>';
         $html .= '<td>' . number_format($info->Basic_pay, 2) . '</td>';
 
         // Allowance values dynamically inserted
@@ -110,6 +113,7 @@ foreach ($departments as $departmentName => $empList) {
 
         $html .= '<td>' . number_format($info->Gross_pay, 2) . '</td>';
         $html .= '<td>' . number_format($info->Salary_advance, 2) . '</td>';
+        $html .= '<td>' . number_format($info->Loan_Instalment, 2) . '</td>';
         $html .= '<td>' . number_format($info->no_pay_deduction, 2) . '</td>';
         $html .= '<td>' . number_format($info->Late_deduction, 2) . '</td>';
         $html .= '<td>' . number_format($info->Wellfare, 2) . '</td>';
