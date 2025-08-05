@@ -73,6 +73,13 @@ public function Pay_sheet_Report_By_Cat(){
             $filter .= " AND tbl_departments.Dep_ID = '$departments'";
         }
     }
+    if (($this->input->post("cmb_branch"))) {
+        if ($filter == '') {
+            $filter = " WHERE tbl_branches.B_id = '$branch'";
+        } else {
+            $filter .= " AND tbl_branches.B_id = '$branch'";
+        }
+    }
 
     // Get raw joined data with allowances and deductions
     $raw_data = $this->Db_model->getfilteredData("SELECT 
