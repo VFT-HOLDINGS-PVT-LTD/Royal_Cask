@@ -325,8 +325,8 @@ $User_Name = $currentUser[0]->Emp_Full_Name;
                                                 <?php endif; ?>
 
                                                 <?php if ($currentUser[0]->payroll_process == 1): ?>
-                                    <li><a href="<?php echo base_url(); ?>Pay/Payroll_Process_Init">PAYROLL INITIALIZE</a></li>
-                                <?php endif; ?>
+                                                    <li><a href="<?php echo base_url(); ?>Pay/Payroll_Process_Init">PAYROLL INITIALIZE</a></li>
+                                                <?php endif; ?>
 
                                                 <?php if ($currentUser[0]->payroll_process == 1): ?>
                                                     <li><a href="<?php echo base_url(); ?>Pay/Payroll_Edit_Old">PAYROLL EDIT</a></li>

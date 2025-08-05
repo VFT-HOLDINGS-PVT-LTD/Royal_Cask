@@ -28,7 +28,7 @@ class Payroll_Process extends CI_Controller
         $year = (int) $this->input->post('cmb_year');
 
         $employees = $this->Db_model->getfilteredData("
-            SELECT EmpNo, Dep_ID,Des_ID,Grp_ID, Basic_Salary, BR1, BR2, is_nopay_calc, Is_EPF, Emp_Full_Name,Incentive
+            SELECT EmpNo, Dep_ID,Des_ID,Grp_ID, Basic_Salary,EMP_ST_ID , BR1, BR2, is_nopay_calc, Is_EPF, Emp_Full_Name,Incentive
             FROM tbl_empmaster 
             WHERE Status = 1 AND Active_process = 1
         ");
@@ -44,6 +44,7 @@ class Payroll_Process extends CI_Controller
             $Dep_ID = (int) $emp->Dep_ID;
             $Des_ID = (int) $emp->Des_ID;
             $Grp_ID = (int) $emp->Grp_ID;
+            $emp_status = (int) $emp->EMP_ST_ID;
 
             $HasmsRow_MS = $this->Db_model->getfilteredData("select COUNT(tbl_individual_roster.EmpNo) AS misspunch from tbl_individual_roster where EmpNo='$EmpNo' 
                 and EXTRACT(MONTH FROM FDate)='$month' and EXTRACT(YEAR FROM FDate)='$year' AND DayStatus = 'MS'");
@@ -233,6 +234,7 @@ class Payroll_Process extends CI_Controller
                     $halfday_day_amount,
                     $BataAllowance,
                     $OT_Results_unites,
+                    $emp_status,
                     $setting
 
                 );
@@ -359,6 +361,7 @@ class Payroll_Process extends CI_Controller
         $halfday_day_amount,
         $BataAllowance,
         $OT_Results_unites,
+        $emp_status,
         $Setting
 
     ) {
@@ -379,9 +382,16 @@ class Payroll_Process extends CI_Controller
         $StampDeduction = ($TotalForEPF > 25000) ? 25 : 0;
 
         // EPF and ETF calculation
-        $EPF_8 = 0.08 * $TotalForEPF;
-        $EPF_12 = 0.12 * $TotalForEPF;
-        $ETF_3 = 0.03 * $TotalForEPF;
+        if ($emp_status == 1) {
+            $EPF_8 = 0.08 * $TotalForEPF;
+            $EPF_12 = 0.12 * $TotalForEPF;
+            $ETF_3 = 0.03 * $TotalForEPF;
+        } else {
+            $EPF_8 =  0;
+            $EPF_12 = 0;
+            $ETF_3 =  0;
+        }
+
 
         if ($Setting[0]->Epf_Limit == 1) {
             $TotalDeduction = $AdvanceAmount + $payeeTax + $Festival_Adavance + $halfday_day_amount + $Loan_Amount + $NopayDeduction + $StampDeduction + $VariableDeductionAmount + $FixedDeductionAmount + $Late_Amount['Late_Amount'] + $EarlyDep_Amount['ED_Amount'];
