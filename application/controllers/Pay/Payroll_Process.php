@@ -369,7 +369,7 @@ class Payroll_Process extends CI_Controller
         $GrossSal = $TotalForEPF + $VariableAllowancesAmount + $FixedAllowancesAmount + $OT_Results_unites['ot_unites_amount'] + $OT_Results['double'] + $BataAllowance;
 
         //calculate nopay deduction
-        $NopayRate = $BasicSal / 30; // Assuming 30 days in a month
+        $NopayRate = $BasicSal / 26; // Assuming 30 days in a month
         $NopayDeduction = ($is_no_pay_calc == 1) ? 0 : ($NopayDays * $NopayRate);
 
         //payee tax calculation is on below function
@@ -784,8 +784,8 @@ class Payroll_Process extends CI_Controller
                 'double_hours' => $D_OT_Hours
             ];
         } else {
-            $OT_Rate = (($BasicSal) / 270) * 1.5;
-            $OT_Rate_2 = (($BasicSal) / 270) * 2;
+            $OT_Rate = (($BasicSal) / 240) * 1.5;
+            $OT_Rate_2 = (($BasicSal) / 240) * 2;
 
             $N_OT_Amount = $OT_Rate * ($N_OT_Hours / 60);
             $D_OT_Amount = $OT_Rate_2 * ($D_OT_Hours / 60);
@@ -812,8 +812,8 @@ class Payroll_Process extends CI_Controller
                 'ot_unites_amount' => $N_OT_Amount
             ];
         } else {
-            $OT_Rate = (($BasicSal) / 270) * 1.5;
-            $OT_Rate_2 = (($BasicSal) / 270) * 2;
+            $OT_Rate = (($BasicSal) / 240) * 1.5;
+            $OT_Rate_2 = (($BasicSal) / 240) * 2;
 
             $N_OT_Amount = ($OT_Rate / 2) * $N_OT_unites;
             // $D_OT_Amount = $OT_Rate_2 * ($D_OT_Hours / 60);
@@ -840,7 +840,7 @@ class Payroll_Process extends CI_Controller
                 'Late_Amount' => $Late_Amount
             ];
         } else {
-            $Late_rate = ($BasicSal / 270) / 60;
+            $Late_rate = ($BasicSal / 240) / 60;
             $Late_Amount = $Late_rate * $Late_Min;
             // echo "late munites " . $Late_Min;
             // echo "<br/>";
@@ -866,7 +866,7 @@ class Payroll_Process extends CI_Controller
                 'ED_Amount' => $ed_amount
             ];
         } else {
-            $ed_rate = ($BasicSal / 270) / 60;
+            $ed_rate = ($BasicSal / 240) / 60;
             $ed_amount = $ed_rate * $ed_min;
             // echo "ed munites " . $ed_min;
             // echo "<br/>";
@@ -962,7 +962,7 @@ class Payroll_Process extends CI_Controller
 
         $halfday_days = $halfday_deduct[0]->misspunch;
 
-        $halfday_day_rate = $BasicSal / 30;
+        $halfday_day_rate = $BasicSal / 26;
         $halfday_day_amount = $halfday_days * $halfday_day_rate;
 
         return 0;
