@@ -48,7 +48,7 @@ class Payroll_Process extends CI_Controller
 
             $HasmsRow_MS = $this->Db_model->getfilteredData("select COUNT(tbl_individual_roster.EmpNo) AS misspunch from tbl_individual_roster where EmpNo='$EmpNo' 
                 and EXTRACT(MONTH FROM FDate)='$month' and EXTRACT(YEAR FROM FDate)='$year' AND DayStatus = 'MS'");
-            if ($HasmsRow_MS[0]->misspunch == 0) {
+            // if ($HasmsRow_MS[0]->misspunch == 0) {
                 // echo $EmpNo;
                 // Get Department Name
                 $dep = $this->Db_model->getfilteredData("SELECT Dep_Name FROM tbl_departments WHERE Dep_ID = $Dep_ID");
@@ -314,7 +314,7 @@ class Payroll_Process extends CI_Controller
                     'DEDUCT_1' => number_format($salaryData['Deduct_1'], 2),
                     'Other_OT' => number_format($salaryData['Other_OT'], 2),
                 ];
-            }
+            // }
         }
 
 
