@@ -202,10 +202,10 @@ class Payroll_Process extends CI_Controller
                 // Total Early Departure Minutes
                 $Early_Dep_Minutes = $earlyDeparture[0]->ed ?? 0;
 
-                $OT_Results = $this->calculateOvertime($emp->Basic_Salary, $FixedAllowancesAmount, $N_OT_Hours, $D_OT_Hours, $setting);
-                $OT_Results_unites = $this->calculateOvertime_unites($emp->Basic_Salary, $FixedAllowancesAmount, $N_OT_Unites, $setting);
-                $Late_Amount = $this->calculateLateDeduction($emp->Basic_Salary, $Late_Minutes, $setting);
-                $EarlyDep_Amount = $this->calculateEarlyDepartureDeduction($emp->Basic_Salary, $Early_Dep_Minutes, $setting);
+                $OT_Results = $this->calculateOvertime($emp->Basic_Salary,$emp->BR1,$emp->BR2, $FixedAllowancesAmount, $N_OT_Hours, $D_OT_Hours, $setting);
+                $OT_Results_unites = $this->calculateOvertime_unites($emp->Basic_Salary, $emp->BR1,$emp->BR2,$FixedAllowancesAmount, $N_OT_Unites, $setting);
+                $Late_Amount = $this->calculateLateDeduction($emp->Basic_Salary,$emp->BR1,$emp->BR2, $Late_Minutes, $setting);
+                $EarlyDep_Amount = $this->calculateEarlyDepartureDeduction($emp->Basic_Salary,$emp->BR1,$emp->BR2, $Early_Dep_Minutes, $setting);
                 $Festival_Adavance = $this->processFestivalAdvance($EmpNo, $month, $year);
                 $Loan_Amount = $this->processLoanInstallments($EmpNo, $month, $year);
                 $halfday_day_amount = $this->processHalfdayDeduction($emp->Basic_Salary, $EmpNo, $month, $year);
@@ -372,7 +372,7 @@ class Payroll_Process extends CI_Controller
         $GrossSal = $TotalForEPF + $VariableAllowancesAmount + $FixedAllowancesAmount + $OT_Results_unites['ot_unites_amount'] + $OT_Results['double'] + $BataAllowance;
 
         //calculate nopay deduction
-        $NopayRate = $BasicSal / 26; // Assuming 30 days in a month
+        $NopayRate = ($BasicSal + $BR1 + $BR2) / 26; // Assuming 30 days in a month
         $NopayDeduction = ($is_no_pay_calc == 1) ? 0 : ($NopayDays * $NopayRate);
 
         //payee tax calculation is on below function
@@ -779,7 +779,7 @@ class Payroll_Process extends CI_Controller
     }
 
     // Function to calculate overtime
-    private function calculateOvertime($BasicSal, $Fixed_Allowance, $N_OT_Hours, $D_OT_Hours, $Setting)
+    private function calculateOvertime($BasicSal, $BR1,$BR2,$Fixed_Allowance, $N_OT_Hours, $D_OT_Hours, $Setting)
     {
         if ($Setting[0]->Is_Ot_Fixed_Amount_Rate == 1) {
             // echo "ot munites " . $N_OT_Hours;
@@ -794,8 +794,8 @@ class Payroll_Process extends CI_Controller
                 'double_hours' => $D_OT_Hours
             ];
         } else {
-            $OT_Rate = (($BasicSal) / 240) * 1.5;
-            $OT_Rate_2 = (($BasicSal) / 240) * 2;
+            $OT_Rate = (($BasicSal+ $BR1 + $BR2) / 240) * 1.5;
+            $OT_Rate_2 = (($BasicSal+ $BR1 + $BR2) / 240) * 2;
 
             $N_OT_Amount = $OT_Rate * ($N_OT_Hours / 60);
             $D_OT_Amount = $OT_Rate_2 * ($D_OT_Hours / 60);
@@ -810,7 +810,7 @@ class Payroll_Process extends CI_Controller
         }
     }
 
-    private function calculateOvertime_unites($BasicSal, $Fixed_Allowance, $N_OT_unites, $Setting)
+    private function calculateOvertime_unites($BasicSal,$BR1,$BR2, $Fixed_Allowance, $N_OT_unites, $Setting)
     {
         if ($Setting[0]->Is_Ot_Fixed_Amount_Rate == 1) {
             echo "ot munites " . $N_OT_unites;
@@ -822,8 +822,8 @@ class Payroll_Process extends CI_Controller
                 'ot_unites_amount' => $N_OT_Amount
             ];
         } else {
-            $OT_Rate = (($BasicSal) / 240) * 1.5;
-            $OT_Rate_2 = (($BasicSal) / 240) * 2;
+            $OT_Rate = (($BasicSal + $BR1 + $BR2) / 240) * 1.5;
+            $OT_Rate_2 = (($BasicSal + $BR1 + $BR2) / 240) * 2;
 
             $N_OT_Amount = ($OT_Rate / 2) * $N_OT_unites;
             // $D_OT_Amount = $OT_Rate_2 * ($D_OT_Hours / 60);
@@ -836,7 +836,7 @@ class Payroll_Process extends CI_Controller
     }
 
     // Function to calculate late deduction
-    private function calculateLateDeduction($BasicSal, $Late_Min, $Setting)
+    private function calculateLateDeduction($BasicSal,$BR1,$BR2, $Late_Min, $Setting)
     {
 
         if ($Setting[0]->Is_Ot_Fixed_Amount_Rate == 1) {
@@ -850,7 +850,7 @@ class Payroll_Process extends CI_Controller
                 'Late_Amount' => $Late_Amount
             ];
         } else {
-            $Late_rate = ($BasicSal / 240) / 60;
+            $Late_rate = (($BasicSal + $BR1 + $BR2) / 240) / 60;
             $Late_Amount = $Late_rate * $Late_Min;
             // echo "late munites " . $Late_Min;
             // echo "<br/>";
@@ -862,7 +862,7 @@ class Payroll_Process extends CI_Controller
     }
 
     // Function to calculate early departure deduction
-    private function calculateEarlyDepartureDeduction($BasicSal, $ed_min, $Setting)
+    private function calculateEarlyDepartureDeduction($BasicSal,$BR1,$BR2, $ed_min, $Setting)
     {
 
         if ($Setting[0]->Is_Ot_Fixed_Amount_Rate == 1) {
@@ -876,7 +876,7 @@ class Payroll_Process extends CI_Controller
                 'ED_Amount' => $ed_amount
             ];
         } else {
-            $ed_rate = ($BasicSal / 240) / 60;
+            $ed_rate = (($BasicSal + $BR1 + $BR2) / 240) / 60;
             $ed_amount = $ed_rate * $ed_min;
             // echo "ed munites " . $ed_min;
             // echo "<br/>";
