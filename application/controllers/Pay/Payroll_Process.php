@@ -813,8 +813,8 @@ class Payroll_Process extends CI_Controller
     private function calculateOvertime_unites($BasicSal,$BR1,$BR2, $Fixed_Allowance, $N_OT_unites, $Setting)
     {
         if ($Setting[0]->Is_Ot_Fixed_Amount_Rate == 1) {
-            echo "ot munites " . $N_OT_unites;
-            echo "<br/>";
+            // echo "ot munites " . $N_OT_unites;
+            // echo "<br/>";
 
             $OT_Rate = $Setting[0]->Ot_Rate;
             $N_OT_Amount = ($OT_Rate / 2) * $N_OT_unites;
@@ -827,8 +827,8 @@ class Payroll_Process extends CI_Controller
 
             $N_OT_Amount = ($OT_Rate / 2) * $N_OT_unites;
             // $D_OT_Amount = $OT_Rate_2 * ($D_OT_Hours / 60);
-            echo "ot munites " . $N_OT_unites;
-            echo "<br/>";
+            // echo "ot munites " . $N_OT_unites;
+            // echo "<br/>";
             return [
                 'ot_unites_amount' => $N_OT_Amount
             ];
