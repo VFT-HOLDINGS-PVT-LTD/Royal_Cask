@@ -153,7 +153,7 @@
 
                                                                     <div class="form-group col-sm-3">
                                                                         <label for="focusedinput"
-                                                                            class="col-sm-4 control-label">Group</label>
+                                                                            class="col-sm-4 control-label">Branch</label>
                                                                         <div class="col-sm-8">
                                                                             <select class="form-control" id="cmb_group"
                                                                                 name="cmb_group">
@@ -161,10 +161,10 @@
 
                                                                                 <option value="" default>-- Select --
                                                                                 </option>
-                                                                                <?php foreach ($data_group as $t_data) { ?>
+                                                                                <?php foreach ($data_branch as $t_data) { ?>
                                                                                 <option
-                                                                                    value="<?php echo $t_data->Grp_ID; ?>">
-                                                                                    <?php echo $t_data->EmpGroupName; ?>
+                                                                                    value="<?php echo $t_data->B_id; ?>">
+                                                                                    <?php echo $t_data->B_name; ?>
                                                                                 </option>
 
                                                                                 <?php }

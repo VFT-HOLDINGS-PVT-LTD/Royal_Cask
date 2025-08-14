@@ -27,6 +27,7 @@ class Pay_slip extends CI_Controller {
         $data['data_dep'] = $this->Db_model->getData('Dep_ID,Dep_Name', 'tbl_departments');
         $data['data_desig'] = $this->Db_model->getData('Des_ID,Desig_Name', 'tbl_designations');
         $data['data_cmp'] = $this->Db_model->getData('Cmp_ID,Company_Name', 'tbl_companyprofile');
+        $data['data_branch'] = $this->Db_model->getData('B_id,B_name', 'tbl_branches');
         $this->load->view('Reports/Payroll/Pay_slip_report', $data);
     }
 
