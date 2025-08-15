@@ -120,17 +120,17 @@ class Pay_slip extends CI_Controller {
             $data['allowances'][$EmpNo] = [
                 'fixed' => $this->Db_model->getfilteredData("
                     SELECT a.Allowance_name, b.Amount 
-                    FROM tbl_allowance_type a 
-                    JOIN tbl_allowance_has_tbl_salary c ON a.Alw_ID = c.tbl_varialble_allowance_ID 
-                    JOIN tbl_fixed_allowance b ON b.EmpNo = c.EmpNo
+                    FROM tbl_allowance_has_tbl_salary c
+                    INNER JOIN tbl_fixed_allowance b ON b.ID = c.tbl_varialble_allowance_ID
+                    INNER JOIN tbl_allowance_type a ON b.Alw_ID = a.Alw_ID
                     WHERE c.EmpNo = '$EmpNo' AND c.Allowance_Status = 'fixed_allowance'
                     GROUP BY c.tbl_varialble_allowance_ID
                 "),
                 'variable' => $this->Db_model->getfilteredData("
                     SELECT a.Allowance_name, b.Amount
                     FROM tbl_allowance_has_tbl_salary c
-                    JOIN tbl_allowance_type a ON c.tbl_varialble_allowance_ID = a.Alw_ID
-                    JOIN tbl_varialble_allowance b ON b.Alw_ID = a.Alw_ID AND b.EmpNo = c.EmpNo
+                    INNER JOIN tbl_varialble_allowance b ON b.ID = c.tbl_varialble_allowance_ID
+                    INNER JOIN tbl_allowance_type a ON a.Alw_ID = b.Alw_ID
                     WHERE c.EmpNo = '$EmpNo' 
                     AND c.Allowance_Status = 'varialble_allowance'
                     AND b.Month = '$Month' AND b.Year = '$year'
@@ -140,18 +140,18 @@ class Pay_slip extends CI_Controller {
             $data['deductions'][$EmpNo] = [
                 'fixed' => $this->Db_model->getfilteredData("
                     SELECT a.Deduction_name, c.Amount 
-                    FROM tbl_deduction_types a 
-                    JOIN tbl_deduction_has_tbl_salary b ON a.Ded_ID = b.tbl_varialble_deduction_ID 
-                    JOIN tbl_fixed_deduction c ON c.Deduction_ID = a.Ded_ID
+                    FROM tbl_deduction_has_tbl_salary b 
+                    INNER JOIN tbl_variable_deduction c ON b.tbl_varialble_deduction_ID = c.ID
+                    INNER JOIN tbl_deduction_types a ON c.Ded_ID = a.Ded_ID
                     WHERE b.Deduction_Status = 'fixed_deduction' 
                     AND b.EmpNo = '$EmpNo'
                     GROUP BY b.tbl_varialble_deduction_ID
                 "),
                 'variable' => $this->Db_model->getfilteredData("
                     SELECT a.Deduction_name, c.Amount 
-                    FROM tbl_deduction_types a 
-                    JOIN tbl_deduction_has_tbl_salary b ON a.Ded_ID = b.tbl_varialble_deduction_ID 
-                    JOIN tbl_variable_deduction c ON c.Ded_ID = a.Ded_ID
+                    FROM tbl_deduction_has_tbl_salary b 
+                    INNER JOIN tbl_variable_deduction c ON b.tbl_varialble_deduction_ID = c.ID
+                    INNER JOIN tbl_deduction_types a ON c.Ded_ID = a.Ded_ID
                     WHERE b.Deduction_Status = 'varialble_deduction' 
                     AND b.EmpNo = '$EmpNo' 
                     AND c.Month = '$Month' AND c.Year = '$year'
@@ -159,6 +159,7 @@ class Pay_slip extends CI_Controller {
                 ")
             ];
         }
+        // echo json_encode($data['allowances']);
         // var_dump($data['data_set']);
         // var_dump($data['allowances']);
         // var_dump($data['deductions']);

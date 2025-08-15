@@ -31,7 +31,6 @@ try {
         if ($current_payslip % $payslips_per_page == 0) {
             $pdf->AddPage('P', 'A4');
         }
-        
         $EmpNo = $emp->EmpNo;
         $emp_allowances = isset($allowances[$EmpNo]) ? $allowances[$EmpNo] : ['fixed'=>[], 'variable'=>[]];
         $emp_deductions = isset($deductions[$EmpNo]) ? $deductions[$EmpNo] : ['fixed'=>[], 'variable'=>[]];
@@ -39,8 +38,10 @@ try {
         $total_allowances = 0;
         $total_deductions = 0;
         $earnings_html = '';
+        
         foreach (['fixed', 'variable'] as $type) {
             if (!empty($emp_allowances[$type])) {
+                
                 foreach ($emp_allowances[$type] as $alw) {
                     if (isset($alw->Allowance_name) && isset($alw->Amount)) {
                         $earnings_html .= '<tr>
