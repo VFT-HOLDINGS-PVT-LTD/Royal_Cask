@@ -79,6 +79,7 @@ try {
         $Late_deduction = isset($emp->Late_deduction) ? (float)$emp->Late_deduction : 0;
         $Ed_deduction = isset($emp->Ed_deduction) ? (float)$emp->Ed_deduction : 0;
         $payee_amount = isset($emp->Payee_amount) ? (float)$emp->Payee_amount : 0;
+        $Loan_amount = isset($emp->Loan_Instalment) ? (float)$emp->Loan_Instalment : 0;
         $epf_worker = isset($emp->EPF_Worker_Amount) ? (float)$emp->EPF_Worker_Amount : 0;
         $epf_employer = isset($emp->EPF_Employee_Amount) ? (float)$emp->EPF_Employee_Amount : 0;
         $etf_amount = isset($emp->ETF_Amount) ? (float)$emp->ETF_Amount : 0;
@@ -285,6 +286,10 @@ try {
                 <tr>
                     <td>Salary Advance</td>
                     <td class="amount">' . number_format($salary_advance, 2) . '</td>
+                </tr>
+                <tr>
+                    <td>Loan Amount</td>
+                    <td class="amount">' . number_format($Loan_amount, 2) . '</td>
                 </tr>
                 <tr>
                     <td>Late Deduction</td>

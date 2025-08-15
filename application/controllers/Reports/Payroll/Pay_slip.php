@@ -99,6 +99,7 @@ class Pay_slip extends CI_Controller {
                 s.Gross_pay,
                 s.no_pay_deduction,
                 s.Late_deduction,
+                s.Loan_Instalment,
                 s.Ed_deduction,
                 s.Normal_OT_Pay,
                 s.Incentive,
