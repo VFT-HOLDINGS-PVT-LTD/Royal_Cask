@@ -160,7 +160,7 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                         $InDate = $dt_in_Records['dt_Records'][0]->AttDate;
                         $InTime = $dt_in_Records['dt_Records'][0]->INTime;
                         $from_time = '20:00:00';
-                        $to_time = '08:00:00';
+                        $to_time = '05:00:00';
                         $newDate = date('Y-m-d', strtotime($FromDate . ' +1 day'));
                         $to_date = $newDate;
                         if ($shift_day == 'Saturday') {
@@ -213,7 +213,7 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                     if (!empty($InTime_check_night) && empty($OutTime_check_night) && !empty($dt_in_Records['dt_Records'][1]->INTime)) {
                         $InTime = $InTime_check_night;
                         $from_time = '20:00:00';
-                        $to_time = '08:00:00';
+                        $to_time = '05:00:00';
                         $to_date = $newDate;
                         if ($shift_day == 'Saturday') {
                             $to_time = '01:00:00';
@@ -312,7 +312,7 @@ FROM tbl_individual_roster INNER JOIN tbl_empmaster ON tbl_empmaster.EmpNo = tbl
                     if (!empty($dt_in_Records['dt_Records'][0]->INTime) && !empty($dt_out_Records['dt_out_Records'][0]->OutTime)) {
                         $InTime = $InTime_check_night_any;
                         $from_time = '20:00:00';
-                        $to_time = '08:00:00';
+                        $to_time = '05:00:00';
                         $to_date = $newDate;
                         $OutDate = $OutDate_check_night_any;
                         $OutTime = $OutTime_check_night_any;
